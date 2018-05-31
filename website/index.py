@@ -1,6 +1,5 @@
 #!/usr/bin/python3.6
 from simplerr.web import web
-from common.models.main import *
 
 @web('/', '/index.html')
 def index(request):
