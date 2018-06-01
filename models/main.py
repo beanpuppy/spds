@@ -40,18 +40,19 @@ class BaseModel(Model):
 
 class Playlist(BaseModel):
     id = AutoField(column_name='id', null=False)
+    playlist_id=CharField(column_name='playlistID', null=False)
     name = CharField(column_name='name', null=False)
     author = CharField(column_name='author', null=False)
     date = DateTimeField(column_name='date', null=False)
-    score = IntegerField(column_name='score', null=False)
+    score = IntegerField(column_name='score')
 
     class Meta:
-        table_name = 'PlaylistsCache'
+        table_name = 'Playlists'
 
 class Track(BaseModel):
     id = AutoField(column_name='id', null=False)
     name = CharField(column_name='name', null=False)
-    score = IntegerField(colmn_name='score', null=False)
+    score = IntegerField(column_name='score', null=False)
 
     class Meta:
         table_name = 'Tracks'
@@ -64,15 +65,15 @@ class Artist(BaseModel):
         table_name = 'Artists'
 
 class PlaylistTrack(BaseModel):
-    playlist_id = ForiegnKeyField(Playlist, backref='tracks')
-    track_id = ForiegnKeyField(Track, backref='playlists')
+    playlist_id = ForeignKeyField(Playlist, backref='tracks')
+    track_id = ForeignKeyField(Track, backref='playlists')
 
     class Meta:
         table_name = 'LinkPlaylistsToTracks'
 
 class TrackArtist(BaseModel):
-    track_id = ForiegnKeyField(Playlist, backref='artists')
-    artist_id = ForiegnKeyField(Track, backref='tracks')
+    track_id = ForeignKeyField(Playlist, backref='artists')
+    artist_id = ForeignKeyField(Track, backref='tracks')
 
     class Meta:
         table_name = 'LinkTracksToArtists'
