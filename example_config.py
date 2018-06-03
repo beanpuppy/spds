@@ -11,9 +11,13 @@ class ConfigBase(object):
                              **{'charset': 'utf8',
                                 'use_unicode': True,
                                 'user': 'USER',
-                                'passwd': 'ROOT'})
+                                'passwd': 'PASSWORD'})
 
+    # Spotify API
     ID = "CLIENT ID"
     SECRET = "SECRET CLIENT ID"
+
+    # Genius API
+    TOKEN = "TOKEN"
 
 class Config(ConfigBase): pass

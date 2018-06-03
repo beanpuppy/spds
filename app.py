@@ -13,7 +13,6 @@ def auth():
 
 @app.route("/callback/")
 def callback():
-
     auth_token = request.args['code']
     auth_header = spotify.authorize(auth_token)
     session['auth_header'] = auth_header
@@ -44,17 +43,23 @@ def search():
 
     return render_template('search.html')
 
+@app.route('/score')
+def score():
+    if 'auth_header' not in session: return search()
+
+    return render_template('score.html')
+
 @app.route('/analyse', methods=['GET'])
 def analyse():
     if 'auth_header' not in session: return {'error':{'status':'440', 'message':'Not authenticated'}}
     auth_header = session['auth_header']
+    user        = spotify.get_users_profile(auth_header)
 
-    user = spotify.get_users_profile(auth_header)
-
-    playlist = request.args.get('playlist')
-    store    = request.args.get('store')
-
-    tracks = spotify.get_playlist_tracks(user.get('id'), playlist, auth_header)
+    playlist_id = request.args.get('playlist')
+    store       = request.args.get('store')
+    
+    playlist = spotify.get_playlist(user.get('id'), playlist_id, auth_header)
+    tracks   = spotify.get_playlist_tracks(user.get('id'), playlist_id, auth_header)
 
     # Do
 
@@ -62,7 +67,7 @@ def analyse():
     if store == 'yes':
         pass
 
-    return jsonify(tracks)
+    return jsonify({**playlist, 'tracks': tracks})
 
 if __name__ == "__main__":
     app.run(debug=True, port=spotify.PORT)
