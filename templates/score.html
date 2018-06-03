@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="section" ng-app="score" ng-controller="scoreCtrl">
+    {a callback a}
+</div>
+
+{% endblock %}
+
+{% block feet %}
+<script src="{{ url_for('static', filename='js/angular/score.js') }}" type="text/javascript"></script>
+{% endblock %}

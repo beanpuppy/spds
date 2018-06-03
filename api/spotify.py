@@ -205,19 +205,23 @@ def get_featured_playlists(auth_header):
 # ---------------- 4.1 USER PLAYLISTS ------------------------
 # https://developer.spotify.com/documentation/web-api/reference/playlists/
 
+# https://developer.spotify.com/documentation/web-api/reference/playlists/get-playlist/    
+def get_playlist(user_id, playlist_id, auth_header):
+    url = "{}/users/{}/playlists/{}".format(SPOTIFY_API_URL, user_id, playlist_id)
+    resp = requests.get(url, headers=auth_header)
+    
+    return resp.json()
+
 # https://developer.spotify.com/documentation/web-api/reference/playlists/get-playlists-tracks/
 def get_playlist_tracks(user_id, playlist_id, auth_header):
     # Spotify limits tracks to 100 at a time so we gotta do some loops
-    url = "{}/users/{}/playlists/{}".format(SPOTIFY_API_URL, user_id, playlist_id)
+    url  = "{}/users/{}/playlists/{}/tracks".format(SPOTIFY_API_URL, user_id, playlist_id)
     resp = requests.get(url, headers=auth_header).json()
 
-    tracks = [resp.get('tracks').get('items')]
-    more   = resp.get('tracks').get('next')
-
-    while more:
-        resp   = requests.get(more, headers=auth_header).json()
-        tracks += [track.get('track') for track in resp.get('items')]
-        more   = resp.get('next')
+    tracks = resp.get('items')
+    while resp.get('next'):
+        resp    = requests.get(resp.get('next'), headers=auth_header).json()
+        tracks += [track for track in resp.get('items')]
 
     return tracks
 
