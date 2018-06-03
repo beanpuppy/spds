@@ -81,7 +81,6 @@ AUTH_URL = "{}/?{}".format(SPOTIFY_AUTH_URL, URL_ARGS)
 
 '''
 
-
 def authorize(auth_token):
     code_payload = {
         "grant_type": "authorization_code",
@@ -263,6 +262,7 @@ def get_user_profile(user_id):
 # https://developer.spotify.com/web-api/track-endpoints/
 
 GET_TRACK_ENDPOINT = "{}/{}".format(SPOTIFY_API_URL, 'tracks')  # /<id>
+GET_AUDIO_ENDPOINT = "{}/{}".format(SPOTIFY_API_URL, 'audio_features')  # /<id>
 
 # https://developer.spotify.com/web-api/get-track/
 def get_track(track_id):
@@ -276,3 +276,9 @@ def get_several_tracks(list_of_ids):
     resp = requests.get(url)
     return resp.json()
 
+# https://developer.spotify.com/documentation/web-api/reference/tracks/get-audio-features/
+def get_audio_features(track_id):
+    url = "{}/{id}".format(GET_TRACK_ENDPOINT, id=track_id)
+    resp = requests.get(url)
+
+    return resp.json()

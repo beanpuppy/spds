@@ -3,3 +3,4 @@ peewee==3.0.18
 pymysql==0.8.0
 pyOpenSSL==17.5.0
 requests==2.18.4
+beautifulsoup4==4.6.0
