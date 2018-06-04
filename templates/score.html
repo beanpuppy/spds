@@ -3,7 +3,11 @@
 {% block content %}
 
 <div class="section" ng-app="score" ng-controller="scoreCtrl">
-    {a callback a}
+    <ul>
+        <li ng-repeat="x in callback.tracks">
+            {a x.track.name a} {a x.score a}
+        </li>
+    </ul>
 </div>
 
 {% endblock %}

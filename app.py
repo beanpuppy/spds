@@ -1,9 +1,14 @@
+import re
+from multiprocessing.dummy import Pool as ThreadPool
 from flask import Flask, request, redirect, g, render_template, session, jsonify
-from api import spotify
+
+from api import spotify, genius
+from config import Config
 from models.main import *
 
 app = Flask(__name__)
 app.secret_key = 'some key for session'
+AUTH_HEADER = ''
 
 """AUTH STUFF"""
 
@@ -13,11 +18,11 @@ def auth():
 
 @app.route("/callback/")
 def callback():
-    auth_token = request.args['code']
-    auth_header = spotify.authorize(auth_token)
+    auth_token  = request.args['code']
+    auth_header = spotify.authorise(auth_token)
     session['auth_header'] = auth_header
 
-    return search()
+    return redirect("/search", code=302)
 
 def valid_token(resp):
     return resp is not None and not 'error' in resp
@@ -49,6 +54,31 @@ def score():
 
     return render_template('score.html')
 
+def score_track(track):
+    # query = Track.select().where(Track.spotify_id == track['track']['id'])
+    # if query.exists(): return query[0]
+
+    lyrics, genius_id = genius.get_lyrics(track['track']['name'], track['track']['artists'][0]['name'])
+
+    audio = spotify.get_audio_features(track['track']['id'])
+    audio_valence = audio['valence']
+    score = round(audio_valence * 100)
+
+    lyrical_valence = 0
+
+    if 'error' not in lyrics:
+        words = re.split(r'[\s\]\[]', lyrics)
+        for word in words:
+            if word in Config.LEXICON_SADNESS: lyrical_valence += 1
+            if word in Config.LEXICON_FEAR: lyrical_valence += 1
+            if word in Config.LEXICON_ANGER: lyrical_valence += 1
+
+        pct_sad = lyrical_valence / len(words) * 100
+        lyrical_density = len(words) / track['track']['duration_ms'] * 1000
+        score = round(1 - (1 - audio_valence) + (pct_sad * (1 + lyrical_density))) / 2
+
+    return {**track, 'lyrics': lyrical_valence, 'audio': audio_valence, 'score': score}
+
 @app.route('/analyse', methods=['GET'])
 def analyse():
     if 'auth_header' not in session: return {'error':{'status':'440', 'message':'Not authenticated'}}
@@ -56,18 +86,13 @@ def analyse():
     user        = spotify.get_users_profile(auth_header)
 
     playlist_id = request.args.get('playlist')
-    store       = request.args.get('store')
-    
-    playlist = spotify.get_playlist(user.get('id'), playlist_id, auth_header)
-    tracks   = spotify.get_playlist_tracks(user.get('id'), playlist_id, auth_header)
+    playlist    = spotify.get_playlist(user.get('id'), playlist_id, auth_header)
+    tracks      = spotify.get_playlist_tracks(user.get('id'), playlist_id, auth_header)
 
-    # Do
+    pool     = ThreadPool(8)
+    analysis = pool.map(score_track, tracks)
 
-    # Save playlist to db if they said so
-    if store == 'yes':
-        pass
-
-    return jsonify({**playlist, 'tracks': tracks})
+    return jsonify({**playlist, 'tracks': analysis})
 
 if __name__ == "__main__":
     app.run(debug=True, port=spotify.PORT)

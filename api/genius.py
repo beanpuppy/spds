@@ -48,25 +48,24 @@ def get_song(song_id):
 # so we gotta go scrape their webpage ;)
 
 def scrape_genius(song):
-    page_url = "http://genius.com/{}".format(song['response']['song']['path'])
-    page     = requests.get(page_url)
+    page     = requests.get(song['response']['song']['url'])
     html     = BeautifulSoup(page.text, "html.parser")
    
-    [h.extract() for h in html('script')]  # remove script tags that they put in the middle of the lyrics
+    # [h.extract() for h in html('script')]  # remove script tags that they put in the middle of the lyrics
     
     lyrics = html.find("div", class_="lyrics").get_text() # updated css where the lyrics are based in HTML
-    return lyrics.replace('\n', '')
+    return lyrics.replace('\n', ' ')
 
 def get_lyrics(song_title, artist_name):
     song_info   = None
     search_resp = search(song_title)
 
-    for hit in search_resp.json()['response']['hits']:
+    for hit in search_resp['response']['hits']:
         if hit["result"]["primary_artist"]["name"] == artist_name:
             song_info = hit
             break
     
-    if not song_info: return {'error': {'status': '404', 'message': 'song not found'}}
+    if not song_info: return {'error': {'status': '404', 'message': 'song not found'}}, 'none'
 
     song = get_song(song_info['result']['id'])
-    return scrape_genius(song)
+    return scrape_genius(song), song_info['result']['id']

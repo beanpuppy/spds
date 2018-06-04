@@ -81,7 +81,7 @@ AUTH_URL = "{}/?{}".format(SPOTIFY_AUTH_URL, URL_ARGS)
 
 '''
 
-def authorize(auth_token):
+def authorise(auth_token):
     code_payload = {
         "grant_type": "authorization_code",
         "code": str(auth_token),
@@ -103,6 +103,19 @@ def authorize(auth_token):
     access_token = response_data["access_token"]
 
     # use the access token to access Spotify API
+    auth_header = {"Authorization": "Bearer {}".format(access_token)}
+    return auth_header
+
+def authorise_client_credentials():
+    code_payload = {"grant_type": "client_credentials"}
+
+    base64encoded = base64.b64encode(("{}:{}".format(CLIENT_ID, CLIENT_SECRET)).encode())
+    headers = {"Authorization": "Basic {}".format(base64encoded.decode())}
+
+    post_request  = requests.post(SPOTIFY_TOKEN_URL, data=code_payload, headers=headers)
+    response_data = json.loads(post_request.text)
+    access_token  = response_data["access_token"]
+
     auth_header = {"Authorization": "Bearer {}".format(access_token)}
     return auth_header
 
@@ -262,7 +275,7 @@ def get_user_profile(user_id):
 # https://developer.spotify.com/web-api/track-endpoints/
 
 GET_TRACK_ENDPOINT = "{}/{}".format(SPOTIFY_API_URL, 'tracks')  # /<id>
-GET_AUDIO_ENDPOINT = "{}/{}".format(SPOTIFY_API_URL, 'audio_features')  # /<id>
+GET_AUDIO_ENDPOINT = "{}/{}".format(SPOTIFY_API_URL, 'audio-features')  # /<id>
 
 # https://developer.spotify.com/web-api/get-track/
 def get_track(track_id):
@@ -278,7 +291,7 @@ def get_several_tracks(list_of_ids):
 
 # https://developer.spotify.com/documentation/web-api/reference/tracks/get-audio-features/
 def get_audio_features(track_id):
-    url = "{}/{id}".format(GET_TRACK_ENDPOINT, id=track_id)
-    resp = requests.get(url)
+    url = "{}/{id}".format(GET_AUDIO_ENDPOINT, id=track_id)
+    resp = requests.get(url, headers=authorise_client_credentials())
 
     return resp.json()
