@@ -1,13 +1,51 @@
 {% extends "layout.html" %}
 
+{% block head %}
+<link href="{{ url_for('static', filename='css/loading.css') }}" rel="stylesheet" />
+{% endblock %}
+
 {% block content %}
 
 <div class="section" ng-app="score" ng-controller="scoreCtrl">
-    <ul>
-        <li ng-repeat="x in callback.tracks">
-            {a x.track.name a} {a x.score a}
-        </li>
-    </ul>
+    <div class="loading" loading>
+        <div class="spinner">
+            <div class="rect1"></div>
+            <div class="rect2"></div>
+            <div class="rect3"></div>
+            <div class="rect4"></div>
+            <div class="rect5"></div>
+            <p>Loading...</p>
+        </div>
+        <p class="center">This can take a few minutes depending on how large the playlist is.</p>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 ml-auto mr-auto text-center">
+                <h1 class="title">{a callback.name a}</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <table>
+                    <tr>
+                        <th>#</th>
+                        <th ng-click="changeOrder('track.name')">Name</th>
+                        <th>Artists</th>
+                        <th ng-click="changeOrder('score')">Score</th>
+                    </tr>
+                    <tr ng-repeat="x in callback.tracks | orderBy:orderBy">
+                        <td><p>{a $index a}</p></td>
+                        <td><p><a href="{a x.track.external_urls.spotify a}">{a x.track.name a}</a></p></td>
+                        <td><p ng-repeat="i in x.track.artists"><a href="{a i.external_urls.spotify a}">{a i.name a}</a></p></td>
+                        <td><p>{a x.score a}</p></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+    </div>
+
 </div>
 
 {% endblock %}
