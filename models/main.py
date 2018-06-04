@@ -44,17 +44,18 @@ class Playlist(BaseModel):
     name=CharField(column_name='name', null=False)
     author=CharField(column_name='author', null=False)
     date=DateTimeField(column_name='date', null=False)
-    score=IntegerField(column_name='score')
+    score=IntegerField(column_name='score', null=False)
 
     class Meta:
         table_name = 'Playlists'
 
 class Track(BaseModel):
     id=AutoField(column_name='id', null=False)
-    spotify_id=CharField(column_name='spotify_id')
-    genius_id=CharField(column_name='genius_id')
+    spotify_id=CharField(column_name='spotify_id', null=False)
+    genius_id=CharField(column_name='genius_id', null=False)
     name=CharField(column_name='name', null=False)
     score=IntegerField(column_name='score', null=False)
+    imcomplete=CharField(column_name='incomplete', null=False)
 
     class Meta:
         table_name = 'Tracks'

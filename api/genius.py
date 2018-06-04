@@ -5,13 +5,11 @@ import base64
 import json
 import requests
 import sys
-from bs4 import BeautifulSoup
 
-try:
-    import urllib.request, urllib.error
-    import urllib.parse as urllibparse
-except ImportError:
-    import urllib as urllibparse
+import urllib.request, urllib.error
+import urllib.parse as urllibparse
+
+from bs4 import BeautifulSoup
 
 # ----------------- 0. GENIUS BASE URL ----------------
 
@@ -29,7 +27,7 @@ AUTH_HEADER = {'Authorization': f'Bearer {ACCESS_TOKEN}'}
 # https://docs.genius.com/#!#%2Fauthentication-h1
 
 def search(query):
-    url = f'{GENIUS_API_BASE_URL}/search?q={query}'
+    url  = f'{GENIUS_API_BASE_URL}/search?q={query}'
     resp = requests.get(url, headers=AUTH_HEADER)
 
     return resp.json()
@@ -38,7 +36,7 @@ def search(query):
 # https://docs.genius.com/#songs-h2
 
 def get_song(song_id):
-    url = f'{GENIUS_API_BASE_URL}/songs/{song_id}'
+    url  = f'{GENIUS_API_BASE_URL}/songs/{song_id}'
     resp = requests.get(url, headers=AUTH_HEADER)
 
     return resp.json()
@@ -50,10 +48,8 @@ def get_song(song_id):
 def scrape_genius(song):
     page     = requests.get(song['response']['song']['url'])
     html     = BeautifulSoup(page.text, "html.parser")
-   
-    # [h.extract() for h in html('script')]  # remove script tags that they put in the middle of the lyrics
-    
-    lyrics = html.find("div", class_="lyrics").get_text() # updated css where the lyrics are based in HTML
+    lyrics   = html.find("div", class_="lyrics").get_text() # updated css where the lyrics are based in HTML
+
     return lyrics.replace('\n', ' ')
 
 def get_lyrics(song_title, artist_name):

@@ -56,15 +56,15 @@ def score():
 
 def score_track(track):
     # query = Track.select().where(Track.spotify_id == track['track']['id'])
-    # if query.exists(): return query[0]
+    # if query.exists(): return {**track, **model_to_dict(query[0])}
 
     lyrics, genius_id = genius.get_lyrics(track['track']['name'], track['track']['artists'][0]['name'])
 
-    audio = spotify.get_audio_features(track['track']['id'])
-    audio_valence = audio['valence']
-    score = round(audio_valence * 100)
-
+    audio           = spotify.get_audio_features(track['track']['id'])
+    audio_valence   = audio['valence']
     lyrical_valence = 0
+    score           = round(audio_valence * 100)
+    incomplete      = 'yes'
 
     if 'error' not in lyrics:
         words = re.split(r'[\s\]\[]', lyrics)
@@ -73,11 +73,12 @@ def score_track(track):
             if word in Config.LEXICON_FEAR: lyrical_valence += 1
             if word in Config.LEXICON_ANGER: lyrical_valence += 1
 
-        pct_sad = lyrical_valence / len(words) * 100
+        percent_sad     = lyrical_valence / len(words) * 100
         lyrical_density = len(words) / track['track']['duration_ms'] * 1000
-        score = round(1 - (1 - audio_valence) + (pct_sad * (1 + lyrical_density))) / 2
+        score           = round(1 - (1 - audio_valence) + (percent_sad * (1 + lyrical_density))) / 2
+        incomplete      = 'no'
 
-    return {**track, 'lyrics': lyrical_valence, 'audio': audio_valence, 'score': score}
+    return {**track, 'lyrics': lyrical_valence, 'audio': audio_valence, 'score': score, 'incomplete': incomplete}
 
 @app.route('/analyse', methods=['GET'])
 def analyse():
