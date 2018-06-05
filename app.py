@@ -127,13 +127,13 @@ def analyse():
     for track in analysis: playlist_valence += track['score']
     score = round(playlist_valence / len(analysis))
 
-    Playlist.replace(
+    Playlist.insert(
         playlist_id = playlist_id,
         name = playlist['name'],
         author = owner,
         date = fn.Now(),
         score = score
-    ).execute()
+    ).on_conflict('replace').execute()
 
     return jsonify({**playlist, **get_stats(analysis), 'score': score, 'tracks': analysis})
 

@@ -28,9 +28,10 @@ CREATE TABLE `Playlists` (
   `name` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
   `author` varchar(124) COLLATE utf8mb4_unicode_ci NOT NULL,
   `date` date NOT NULL,
-  `score` float NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `score` float DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `playlist_id_UNIQUE` (`playlist_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -48,7 +49,7 @@ CREATE TABLE `Tracks` (
   `genius_id` varchar(124) COLLATE utf8mb4_unicode_ci NOT NULL,
   `incomplete` varchar(3) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=791 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -60,4 +61,4 @@ CREATE TABLE `Tracks` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-06-05 14:15:46
+-- Dump completed on 2018-06-05 17:19:19
