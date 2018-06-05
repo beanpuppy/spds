@@ -51,19 +51,21 @@
                                  </div>
 
                                 <div class="row">
-                                    <div class="col-md-4">
-                                        <p><strong>Description</strong></p>
-                                        <p>{a callback.description a}</p>
-                                    </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-2">
                                         <p><strong>Tracks:</strong> {a callback.tracks.length a}</p>
                                         <p><strong>Followers:</strong> {a callback.followers.total a}</p>
                                     </div>
-                                    <div class="col-md-2 text-center">
-                                        <p><strong>Score:</strong></p>
+                                    <div class="col-md-6">
+                                        <p><strong>Highest Valence:</strong> {a callback.highest.name a} ({a callback.highest.score a})</p>
+                                        <p><strong>Lowest Valence:</strong> {a callback.lowest.name a} ({a callback.lowest.score a})</p>
+                                        <p><strong>Range:</strong> {a callback.highest.score - callback.lowest.score a}</p>
                                     </div>
                                     <div class="col-md-2 text-center">
-                                        <h1>{a callback.score a}</h1>
+                                        <p><strong>Playlist Score:</strong></p>
+                                    </div>
+                                    <div class="col-md-2 text-center">
+                                        <h1 style="margin-bottom:0">{a callback.score a}</h1>
+                                        <p>Valence</p>
                                     </div>
                                 </div>
 

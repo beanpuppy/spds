@@ -63,21 +63,28 @@ def score_track(track):
 
     audio           = spotify.get_audio_features(track['track']['id'])
     audio_valence   = audio['valence']
-    lyrical_valence = 0
+    lyrical_valence = 0.9 if audio_valence > 0.3 else 0.9 - audio_valence
     score           = round(audio_valence * 100)
     incomplete      = 'yes'
 
     if 'error' not in lyrics:
         words = re.split(r'[\s\]\[]', lyrics)
+        sad_words = 0
         for word in words:
-            if word in Config.LEXICON_SADNESS: lyrical_valence += 1
-            if word in Config.LEXICON_FEAR: lyrical_valence += 0.5
-            if word in Config.LEXICON_ANGER: lyrical_valence += 0.25
+            if word in Config.STOP_WORDS or word == '':
+                words.remove(word)
+                continue
 
-        percent_sad     = lyrical_valence / len(words) * 100
+            if word in Config.LEXICON_SADNESS: sad_words += 5
+            if word in Config.LEXICON_FEAR: sad_words += 2.5
+            if word in Config.LEXICON_ANGER: sad_words += 1
+
+        percent_sad     = sad_words / len(words) * 100
         lyrical_density = len(words) / track['track']['duration_ms'] * 1000
-        score           = round(1 - (1 - audio_valence) + (percent_sad * (1 + lyrical_density))) / 2
+        lyrical_valence = ((1 - (percent_sad * (1 + lyrical_density)) + 100) / 100)
         incomplete      = 'no'
+
+    score = round((audio_valence + lyrical_valence) / 2 * 100)
 
     Track.insert(
         spotify_id = track['track']['id'],
@@ -90,13 +97,23 @@ def score_track(track):
     return {**track, 'lyrics': lyrical_valence, 'audio': audio_valence, 'score': score, 'incomplete': incomplete}
 
 def get_stats(analysis):
-    pass
+    highest = analysis[0]
+    lowest = analysis[0]
+
+    for track in analysis:
+        if track['score'] > highest['score']: highest = track
+        if track['score'] < lowest['score']: lowest = track
+
+    return {'highest': highest, 'lowest': lowest}
 
 @app.route('/analyse', methods=['GET'])
 def analyse():
-    if 'auth_header' not in session: return {'error':{'status':'440', 'message':'Not authenticated'}}
     auth_header = session['auth_header']
     user        = spotify.get_users_profile(auth_header)
+
+    if not valid_token(user):
+        auth_header = spotify.authorise_client_credentials()
+        user['id']  = 'me'
 
     playlist_id = request.args.get('playlist')
     playlist    = spotify.get_playlist(user.get('id'), playlist_id, auth_header)
@@ -118,7 +135,7 @@ def analyse():
         score = score
     ).execute()
 
-    return jsonify({**playlist, 'score': score, 'tracks': analysis})
+    return jsonify({**playlist, **get_stats(analysis), 'score': score, 'tracks': analysis})
 
 if __name__ == "__main__":
     app.run(debug=True, port=spotify.PORT)
