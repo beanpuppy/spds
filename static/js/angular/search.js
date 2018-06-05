@@ -10,6 +10,6 @@ app.controller("searchCtrl", function($scope) {
     $('#new-playlist').submit(function() {
         var playlist = $scope.playlist.split(/(\/|:)/);
         playlist     = playlist[playlist.length-1];
-        window.location.href='/score?playlist='+playlist+'&store='+$scope.store;
+        window.location.href='/score?playlist='+playlist;
     });
 });

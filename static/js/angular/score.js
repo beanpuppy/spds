@@ -7,12 +7,14 @@ app.config(['$interpolateProvider', function($interpolateProvider) {
 
 app.controller("scoreCtrl", function($scope, $location, $http) {
     $scope.url = $location.absUrl().split('?')[1]
+    $scope.loaded = false;
 
     $http({
         method : "GET",
-        url : "analyse?" + $scope.url
+        url    : "analyse?" + $scope.url
     }).then(function(response) {
         $scope.callback = response.data;
+        $scope.loaded   = true;
     });
 
     $scope.changeOrder = function(x) {

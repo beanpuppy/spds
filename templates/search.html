@@ -16,7 +16,7 @@
 {% else %}
 <div class="section">
     <div class="container">
-        <h1 class="title">Hi {{ user.id }}</h1>
+        <h1 class="title">Hi {{ user.display_name or user.id }}</h1>
         <hr/>
         <div class="row">
             <div class="col-md-4">

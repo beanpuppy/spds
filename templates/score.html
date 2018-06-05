@@ -6,47 +6,96 @@
 
 {% block content %}
 
-<div class="section" ng-app="score" ng-controller="scoreCtrl">
-    <div class="loading" loading>
-        <div class="spinner">
-            <div class="rect1"></div>
-            <div class="rect2"></div>
-            <div class="rect3"></div>
-            <div class="rect4"></div>
-            <div class="rect5"></div>
-            <p>Loading...</p>
-        </div>
-        <p class="center">This can take a few minutes depending on how large the playlist is.</p>
-    </div>
-
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12 ml-auto mr-auto text-center">
-                <h1 class="title">{a callback.name a}</h1>
+<span ng-app="score" ng-controller="scoreCtrl">
+    <div class="section" loading>
+        <div class="container">
+            <div class="loading">
+                <div class="spinner">
+                    <div class="rect1"></div>
+                    <div class="rect2"></div>
+                    <div class="rect3"></div>
+                    <div class="rect4"></div>
+                    <div class="rect5"></div>
+                    <p>Loading...</p>
+                </div>
+                <p class="center">This can take a few minutes depending on how large the playlist is.</p>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-12">
-                <table>
-                    <tr>
-                        <th>#</th>
-                        <th ng-click="changeOrder('track.name')">Name</th>
-                        <th>Artists</th>
-                        <th ng-click="changeOrder('score')">Score</th>
-                    </tr>
-                    <tr ng-repeat="x in callback.tracks | orderBy:orderBy">
-                        <td><p>{a $index a}</p></td>
-                        <td><p><a href="{a x.track.external_urls.spotify a}">{a x.track.name a}</a></p></td>
-                        <td><p ng-repeat="i in x.track.artists"><a href="{a i.external_urls.spotify a}">{a i.name a}</a></p></td>
-                        <td><p>{a x.score a}</p></td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-        
     </div>
 
-</div>
+    <span ng-show="loaded">
+        <div class="section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="{a callback.images[1].url a}">
+                    </div>
+                    <div class="col-md-8">
+                        <h1 class="title">{a callback.name a}</h1>
+                        <h4 class="title"><a href="{a callback.owner.external_urls.spotify a}">{a callback.owner.display_name || callback.owner.id a}</a></h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section section-score">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12 ml-auto mr-auto">
+                        <div class="card card-body">
+                            <div class="tab-content">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h2>Playlist Stats</h2>
+                                    </div>
+                                 </div>
+
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <p><strong>Description</strong></p>
+                                        <p>{a callback.description a}</p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <p><strong>Tracks:</strong> {a callback.tracks.length a}</p>
+                                        <p><strong>Followers:</strong> {a callback.followers.total a}</p>
+                                    </div>
+                                    <div class="col-md-2 text-center">
+                                        <p><strong>Score:</strong></p>
+                                    </div>
+                                    <div class="col-md-2 text-center">
+                                        <h1>{a callback.score a}</h1>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h4>Tracks</h4>
+                    <table>
+                        <tr>
+                            <th ng-click="changeOrder('track.name')">Name</th>
+                            <th>Artists</th>
+                            <th ng-click="changeOrder('score')">Score</th>
+                        </tr>
+                        <tr ng-repeat="x in callback.tracks | orderBy:orderBy">
+                            <td><p><a href="{a x.track.external_urls.spotify a}">{a x.track.name a}</a></p></td>
+                            <td><p ng-repeat="i in x.track.artists"><a href="{a i.external_urls.spotify a}">{a i.name a}</a></p></td>
+                            <td><p>{a x.score a}</p></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </span>
+</span>
 
 {% endblock %}
 

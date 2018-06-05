@@ -60,24 +60,3 @@ class Track(BaseModel):
     class Meta:
         table_name = 'Tracks'
 
-class Artist(BaseModel):
-    id=AutoField(column_name='id', null=False)
-    artist_id=CharField(column_name='artist_id', null=False)
-    name=CharField(column_name='name', null=False)
-
-    class Meta:
-        table_name = 'Artists'
-
-class PlaylistTrack(BaseModel):
-    playlist_id=ForeignKeyField(Playlist, backref='tracks')
-    track_id=ForeignKeyField(Track, backref='playlists')
-
-    class Meta:
-        table_name = 'LinkPlaylistsToTracks'
-
-class TrackArtist(BaseModel):
-    track_id=ForeignKeyField(Playlist, backref='artists')
-    artist_id=ForeignKeyField(Track, backref='tracks')
-
-    class Meta:
-        table_name = 'LinkTracksToArtists'
