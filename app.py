@@ -3,6 +3,7 @@ from multiprocessing.dummy import Pool as ThreadPool
 from flask import Flask, request, redirect, g, render_template, session, jsonify
 from playhouse.shortcuts import model_to_dict, dict_to_model
 
+from math import ceil
 from api import spotify, genius
 from config import Config
 from models.main import *
@@ -55,6 +56,8 @@ def score():
 
     return render_template('score.html')
 
+"""ANALYSE STUFF"""
+
 def score_track(track):
     query = Track.select().where(Track.spotify_id == track['track']['id'])
     if query.exists(): return {**track, **model_to_dict(query[0])}
@@ -71,10 +74,7 @@ def score_track(track):
         words = re.split(r'[\s\]\[]', lyrics)
         sad_words = 0
         for word in words:
-            if word in Config.STOP_WORDS or word == '':
-                words.remove(word)
-                continue
-
+            if word in Config.STOP_WORDS or word == '': words.remove(word)
             if word in Config.LEXICON_SADNESS: sad_words += 5
             if word in Config.LEXICON_FEAR: sad_words += 2.5
             if word in Config.LEXICON_ANGER: sad_words += 1
@@ -98,7 +98,7 @@ def score_track(track):
 
 def get_stats(analysis):
     highest = analysis[0]
-    lowest = analysis[0]
+    lowest  = analysis[0]
 
     for track in analysis:
         if track['score'] > highest['score']: highest = track
@@ -106,22 +106,30 @@ def get_stats(analysis):
 
     return {'highest': highest, 'lowest': lowest}
 
+def paginate(analysis, page):
+    results_per_page = 10
+    index = (page-1) * results_per_page if page else 0
+
+    return analysis[index:index+results_per_page]
+
 @app.route('/analyse', methods=['GET'])
 def analyse():
     auth_header = session['auth_header']
     user        = spotify.get_users_profile(auth_header)
 
-    if not valid_token(user):
-        auth_header = spotify.authorise_client_credentials()
-        user['id']  = 'me'
+    if not valid_token(user): auth_header = spotify.authorise_client_credentials()
 
     playlist_id = request.args.get('playlist')
-    playlist    = spotify.get_playlist(user.get('id'), playlist_id, auth_header)
-    owner       = playlist['owner']['display_name'] or playlist['owner']['id']
-    tracks      = spotify.get_playlist_tracks(user.get('id'), playlist_id, auth_header)
+    page        = request.args.get('page')
 
-    pool     = ThreadPool(8)
-    analysis = pool.map(score_track, tracks)
+    playlist    = spotify.get_playlist(user.get('id', 'me'), playlist_id, auth_header)
+    if not valid_token(playlist): return redirect('/search', code=302)
+
+    owner       = playlist['owner']['display_name'] or playlist['owner']['id']
+    tracks      = spotify.get_playlist_tracks(user.get('id', 'me'), playlist_id, auth_header)
+
+    pool        = ThreadPool(8)
+    analysis    = pool.map(score_track, tracks)
 
     playlist_valence = 0
     for track in analysis: playlist_valence += track['score']
@@ -135,7 +143,20 @@ def analyse():
         score = score
     ).on_conflict('replace').execute()
 
-    return jsonify({**playlist, **get_stats(analysis), 'score': score, 'tracks': analysis})
+    pages = [1]
+    if page is None: page = 1
+    page = int(page)
+    for p in range(1,ceil(len(analysis) / 10)):
+        pages.append(pages[-1]+1)
+
+    return jsonify({
+        **playlist, **get_stats(analysis),
+        'score': score,
+        'tracks': paginate(analysis, page),
+        'total': len(analysis),
+        'page': page,
+        'pages': pages
+    })
 
 if __name__ == "__main__":
     app.run(debug=True, port=spotify.PORT)

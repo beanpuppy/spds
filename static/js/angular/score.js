@@ -6,8 +6,9 @@ app.config(['$interpolateProvider', function($interpolateProvider) {
 }]);
 
 app.controller("scoreCtrl", function($scope, $location, $http) {
-    $scope.url = $location.absUrl().split('?')[1]
-    $scope.loaded = false;
+    $scope.url      = $location.absUrl().split('?')[1]
+    $scope.page_url = $location.absUrl().split('?')[1].split('&')[0]
+    $scope.loaded   = false;
 
     $http({
         method : "GET",
@@ -16,10 +17,6 @@ app.controller("scoreCtrl", function($scope, $location, $http) {
         $scope.callback = response.data;
         $scope.loaded   = true;
     });
-
-    $scope.changeOrder = function(x) {
-        $scope.orderBy = x;
-    }
 });
 
 app.directive('loading', ['$http', function($http) {

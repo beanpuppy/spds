@@ -22,5 +22,6 @@ class ConfigBase(object):
     LEXICON_SADNESS = [line.strip() for line in open("./lexicon/sadness.txt", 'r')]
     LEXICON_FEAR    = [line.strip() for line in open("./lexicon/fear.txt", 'r')]
     LEXICON_ANGER   = [line.strip() for line in open("./lexicon/anger.txt", 'r')]
+    STOP_WORDS      = [line.strip() for line in open("./lexicon/stopwords.txt", 'r')]
 
 class Config(ConfigBase): pass

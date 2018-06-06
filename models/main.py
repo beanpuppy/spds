@@ -55,7 +55,7 @@ class Track(BaseModel):
     genius_id=CharField(column_name='genius_id', null=False)
     name=CharField(column_name='name', null=False)
     score=IntegerField(column_name='score', null=False)
-    imcomplete=CharField(column_name='incomplete', null=False)
+    incomplete=CharField(column_name='incomplete', null=False)
 
     class Meta:
         table_name = 'Tracks'

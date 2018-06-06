@@ -7,7 +7,7 @@
 {% block content %}
 
 <span ng-app="score" ng-controller="scoreCtrl">
-    <div class="section" loading>
+    <div class="section" style="padding: 140px 0;" loading>
         <div class="container">
             <div class="loading">
                 <div class="spinner">
@@ -33,6 +33,8 @@
                     <div class="col-md-8">
                         <h1 class="title">{a callback.name a}</h1>
                         <h4 class="title"><a href="{a callback.owner.external_urls.spotify a}">{a callback.owner.display_name || callback.owner.id a}</a></h4>
+                        <p class="description">{a callback.description a}</p>
+                        <div class="separator separator-primary"></div>
                     </div>
                 </div>
             </div>
@@ -52,12 +54,12 @@
 
                                 <div class="row">
                                     <div class="col-md-2">
-                                        <p><strong>Tracks:</strong> {a callback.tracks.length a}</p>
+                                        <p><strong>Tracks:</strong> {a callback.total a}</p>
                                         <p><strong>Followers:</strong> {a callback.followers.total a}</p>
                                     </div>
                                     <div class="col-md-6">
-                                        <p><strong>Highest Valence:</strong> {a callback.highest.track.name a} ({a callback.highest.score a})</p>
-                                        <p><strong>Lowest Valence:</strong> {a callback.lowest.track.name a} ({a callback.lowest.score a})</p>
+                                        <p><strong>Highest Valence: </strong>({a callback.highest.score a}) {a callback.highest.track.name a} - {a callback.highest.track.artists[0].name a} </p>
+                                        <p><strong>Lowest Valence: </strong>({a callback.lowest.score a}) {a callback.lowest.track.name a} - {a callback.lowest.track.artists[0].name a}</p>
                                         <p><strong>Range:</strong> {a callback.highest.score - callback.lowest.score a}</p>
                                     </div>
                                     <div class="col-md-2 text-center">
@@ -65,7 +67,8 @@
                                     </div>
                                     <div class="col-md-2 text-center">
                                         <h1 style="margin-bottom:0">{a callback.score a}</h1>
-                                        <p>Valence</p>
+                                        <p>Valence <a href="#" data-toggle="tooltip" data-placement="top" title="The amount of 'joy' the playlist has. The lower the amount, the more depressing it is.">?</a></p>
+                                        <a href="/search">Score Another</a>
                                     </div>
                                 </div>
 
@@ -76,22 +79,55 @@
             </div>
         </div>
 
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12">
-                    <h4>Tracks</h4>
-                    <table>
-                        <tr>
-                            <th ng-click="changeOrder('track.name')">Name</th>
-                            <th>Artists</th>
-                            <th ng-click="changeOrder('score')">Score</th>
-                        </tr>
-                        <tr ng-repeat="x in callback.tracks | orderBy:orderBy">
-                            <td><p><a href="{a x.track.external_urls.spotify a}">{a x.track.name a}</a></p></td>
-                            <td><p ng-repeat="i in x.track.artists"><a href="{a i.external_urls.spotify a}">{a i.name a}</a></p></td>
-                            <td><p>{a x.score a}</p></td>
-                        </tr>
-                    </table>
+        <div class="section">
+            <div class="container">
+
+                <div class="row">
+                    <div class="col-md-12 ml-auto mr-auto text-center">
+                        <h2>Tracks</h2>
+                        <p>Page {a callback.page a}</p>
+                        <div class="separator separator-primary"></div>
+                    </div>
+                </div>
+
+                <div class="row" style="padding:35px 0;" ng-repeat="x in callback.tracks">
+                    <div class="col-md-2">
+                        <img src="{a x.track.album.images[1].url a}">
+                    </div>
+                    <div class="col-md-4">
+                        <h5>Title</h5>
+                        <p><a href="{a x.track.external_urls.spotify a}">{a x.track.name a}</a></p>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>Artists</h5>
+                        <p ng-repeat="i in x.track.artists"><a href="{a i.external_urls.spotify a}">{a i.name a}</a></p>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <h5>Score</h5>
+                        <h2 style="margin-bottom:15px;">{a x.score a}</h2>
+                        <span class="badge badge-danger" >{a x.incomplete == 'yes' ? 'incomplete' : '' a}</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="container">
+                <div class="justify-content-center">
+                    <ul class="pagination pagination-primary">
+                        <li class="page-item arrow-margin-left">
+                            <a class="page-link" href="/score?{a page_url a}&amp;page=1" aria-label="First">
+                                <span aria-hidden="true"><i class="fa fa-angle-double-left" aria-hidden="true"></i></span>
+                            </a>
+                        </li>
+
+                        <li ng-repeat="x in callback.pages" class="page-item {a callback.page == x ? 'active' : '' a}"><a class="page-link" href="/score?{a page_url a}&amp;page={a x a}">{a x a}</a></li>
+
+                        <li class="page-item arrow-margin-right">
+                            <a class="page-link" href="/score?{a page_url a}&amp;page={a callback.pages[callback.pages.length-1] a}" aria-label="Last">
+                                <span aria-hidden="true"><i class="fa fa-angle-double-right" aria-hidden="true"></i></span>
+                            </a>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
