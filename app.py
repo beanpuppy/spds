@@ -53,8 +53,6 @@ def search():
 
 @app.route('/score')
 def score():
-    if 'auth_header' not in session: return search()
-
     return render_template('score.html')
 
 """ANALYSE STUFF"""
@@ -115,7 +113,7 @@ def paginate(analysis, page):
 
 @app.route('/analyse', methods=['GET'])
 def analyse():
-    auth_header = session['auth_header']
+    auth_header = session.get('auth_header', '')
     user        = spotify.get_users_profile(auth_header)
 
     if not valid_token(user): auth_header = spotify.authorise_client_credentials()

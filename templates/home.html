@@ -8,7 +8,7 @@
         <div class="mt-1">
             <h1>Select a playlist</h1>
         </div>
-        <p class="lead">Please log in to Spotify to select a playlist.</p>
+        <p class="lead">Log in to Spotify to select one of your playlists.</p>
 
         <a type="button" class="btn btn-primary" href="/auth">Login</a>
     </div>
@@ -40,6 +40,7 @@
         </div>
     </div>
 </div>
+{% endif %}
 
 <div class="section" ng-app="search" ng-controller="searchCtrl">
     <form id="new-playlist" method="POST">
@@ -47,7 +48,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-8 ml-auto mr-auto text-center">
-                    <h2 class="title">Or Enter Someone Elses.</h2>
+                    <h2 class="title">Or Search for a playlist manualy.</h2>
                 </div>
             </div>
             <div class="row">
@@ -67,7 +68,6 @@
 
     </form>
 </div>
-{% endif %}
 
 <div class="section section-enter-playlist">
     <div class="container">
