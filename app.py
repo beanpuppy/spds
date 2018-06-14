@@ -10,7 +10,7 @@ from config import Config
 from models.main import *
 
 app = Flask(__name__)
-app.secret_key = 'vvsecretekye'
+app.secret_key = Config.SECRET_KEY
 
 """AUTH STUFF"""
 
@@ -160,4 +160,4 @@ def analyse():
     })
 
 if __name__ == "__main__":
-    app.run(debug=True, port=spotify.PORT)
+    app.run(debug=True, port=80)
