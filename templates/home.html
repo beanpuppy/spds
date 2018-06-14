@@ -2,21 +2,104 @@
 
 {% block content %}
 
-<div class="section section-enter-playlist">
+{% if not user %}
+<div class="section">
     <div class="container">
+        <div class="mt-1">
+            <h1>Select a playlist</h1>
+        </div>
+        <p class="lead">Please log in to Spotify to select a playlist.</p>
+
+        <a type="button" class="btn btn-primary" href="/auth">Login</a>
+    </div>
+</div>
+{% else %}
+<div class="section">
+    <div class="container">
+        <h1 class="title">Hi {{ user.display_name or user.id }}</h1>
+        <hr/>
         <div class="row">
-            <div class="col-md-8 ml-auto mr-auto text-center">
-                <h2 class="title">Start</h2>
-                <p><a href="/search">Go here</a></p>
+            <div class="col-md-4">
+                {% if user.images %}
+                    <img src="{{user.images[0].url}}" class="img-square">
+                {% else %}
+                    <img src="http://bit.ly/2nXRRfX" class="img-square">
+                {% endif %}
+            </div>
+
+            <div class="col-md-6">
+                <h2 class="title">Select One of Your Playlists:</h2>
+                {% for play in user_playlists %}
+                <div class='col-md-12'>
+                    <div class='row'>
+                        <p><a href="/score?playlist={{ play.id }}">{{ play.name }}</a></p>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
         </div>
+    </div>
+</div>
+
+<div class="section" ng-app="search" ng-controller="searchCtrl">
+    <form id="new-playlist" method="POST">
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 ml-auto mr-auto text-center">
+                    <h2 class="title">Or Enter Someone Elses.</h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8 ml-auto mr-auto text-center">
+                    <div class="form-group">
+                        <label style="float:left;">Playlist ID:</label>
+                        <input type="text" ng-model="playlist" placeholder="e.g https://open.spotify.com/user/kasuporo/playlist/5vE5n0P1Ajz081hWLr4q3f?si=o4XPm7PBS5uS7IPZFclKNw" class="form-control">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-10">
+                    <button class="btn btn-primary" style="float:right;" type="submit">Submit</button>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+{% endif %}
+
+<div class="section section-enter-playlist">
+    <div class="container">
         <div class="row">
             <div class="col-md-8 ml-auto mr-auto text-center">
                 <h2 class="title">Recently Seen</h2>
                 <p>From the past 24 hours.</p>
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-8 ml-auto mr-auto">
+            <table>
+                <thead>
+                    <th style="width:65%">Name</th>
+                    <th style="width:30%">Author</th>
+                    <th style="width:5%">Score</th>
+                </thead>
+                <tbody>
+                    {% for playlist in playlists %}
+                    <td><a href="/score?playlist={{ playlist.playlist_id }}">{{ playlist.name }}</a></td>
+                    <td>{{ playlist.author }}</td>
+                    <td>{{ playlist.score }}</td>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        </div>
     </div>
 </div>
 
+{% endblock %}
+
+{% block feet %}
+<script src="{{ url_for('static', filename='js/angular/home.js') }}" type="text/javascript"></script>
 {% endblock %}

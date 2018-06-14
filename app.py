@@ -1,4 +1,5 @@
 import re
+import datetime
 from multiprocessing.dummy import Pool as ThreadPool
 from flask import Flask, request, redirect, g, render_template, session, jsonify
 from playhouse.shortcuts import model_to_dict, dict_to_model
@@ -9,8 +10,7 @@ from config import Config
 from models.main import *
 
 app = Flask(__name__)
-app.secret_key = 'some key for session'
-AUTH_HEADER = ''
+app.secret_key = 'vvsecretekye'
 
 """AUTH STUFF"""
 
@@ -24,7 +24,7 @@ def callback():
     auth_header = spotify.authorise(auth_token)
     session['auth_header'] = auth_header
 
-    return redirect("/search", code=302)
+    return redirect("/", code=302)
 
 def valid_token(resp):
     return resp is not None and not 'error' in resp
@@ -32,23 +32,24 @@ def valid_token(resp):
 """WEB PAGE STUFF"""
 
 @app.route('/')
-def index():
-    return render_template('home.html')
-
-@app.route('/search')
 def search():
+    today     = datetime.datetime.now()
+    yesterday = today - datetime.timedelta(days=1)
+    playlists = Playlist.select().where(Playlist.date.between(yesterday, today))
+
     if 'auth_header' in session:
         auth_header = session['auth_header']
 
         user = spotify.get_users_profile(auth_header)
 
         if valid_token(user): return render_template(
-            "search.html",
+            "home.html",
             user=user,
-            playlists=spotify.get_users_playlists(auth_header)['items']
+            user_playlists=spotify.get_users_playlists(auth_header)['items'],
+            playlists=playlists
         )
 
-    return render_template('search.html')
+    return render_template('home.html', playlists=playlists)
 
 @app.route('/score')
 def score():
