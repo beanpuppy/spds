@@ -81,15 +81,19 @@
             <div class="col-md-8 ml-auto mr-auto">
             <table>
                 <thead>
-                    <th style="width:65%">Name</th>
-                    <th style="width:30%">Author</th>
-                    <th style="width:5%">Score</th>
+                    <tr>
+                        <th style="width:65%">Name</th>
+                        <th style="width:30%">Author</th>
+                        <th style="width:5%">Score</th>
+                    </tr>
                 </thead>
                 <tbody>
                     {% for playlist in playlists %}
-                    <td><a href="/score?playlist={{ playlist.playlist_id }}">{{ playlist.name }}</a></td>
-                    <td>{{ playlist.author }}</td>
-                    <td>{{ playlist.score }}</td>
+                    <tr>
+                        <td><a href="/score?playlist={{ playlist.playlist_id }}">{{ playlist.name }}</a></td>
+                        <td>{{ playlist.author }}</td>
+                        <td>{{ playlist.score }}</td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
