@@ -5,6 +5,7 @@ import base64
 import json
 import requests
 import sys
+import os
 
 import urllib.request, urllib.error
 import urllib.parse as urllibparse
@@ -43,7 +44,9 @@ CLIENT_SECRET = Config.SECRET
 # server side parameter
 CLIENT_SIDE_URL = "http://127.0.0.1"
 PORT = 5000
+
 REDIRECT_URI = "{}:{}/callback/".format(CLIENT_SIDE_URL, PORT)
+if Config.ENV == 'production': REDIRECT_URI = "https://www.playlistdepressionscore.com/callback/"
 SCOPE = "playlist-modify-public playlist-modify-private user-read-recently-played user-top-read"
 STATE = ""
 SHOW_DIALOG_bool = True

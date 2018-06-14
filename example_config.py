@@ -14,6 +14,7 @@ class ConfigBase(object):
                                 'passwd': 'PASSWORD'})
 
     SECRET_KEY = "SECRET KEY"
+    ENV = 'development'
 
     # Spotify API
     ID = "CLIENT ID"
