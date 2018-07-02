@@ -1,7 +1,7 @@
 import sys, os, logging
 logging.basicConfig(stream=sys.stderr)
 
-PROJECT_DIR = '/var/www/www.playlistdepressionscore.com'
+PROJECT_DIR = '/var/www/playlistdepressionscore.com'
 
 # activate_this = f'{PROJECT_DIR}/env/bin/activate'
 # with open(activate_this) as file_:
